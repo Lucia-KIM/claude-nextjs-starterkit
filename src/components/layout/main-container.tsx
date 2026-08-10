@@ -1,0 +1,14 @@
+import { cn } from "@/lib/utils";
+
+interface MainContainerProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export function MainContainer({ children, className }: MainContainerProps) {
+  return (
+    <div className={cn("w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8", className)}>
+      {children}
+    </div>
+  );
+}
