@@ -87,9 +87,12 @@ export default function PageName() {
 
 ### 알려진 이슈
 
+- **AGENTS.md 자동 관리 파일**: 저장소 루트의 `AGENTS.md`는 `npm run dev` 실행 중 Next.js 16에 의해 자동 생성/업데이트됩니다. 이 파일은 Next.js의 breaking change 경고 블록을 포함하고 있으며, git 커밋 시 포함되어야 합니다. 이 파일을 직접 수정하지 마세요.
+  
 - **푸터 임시 링크 (Placeholder)**: 푸터의 10개 링크 (`href="#"`)가 아직 구현되지 않은 페이지에 대한 임시 상태입니다. 실제 404 에러는 발생하지 않으며, 필요에 따라 향후 페이지를 생성하면 됩니다.
   - **미구현 페이지**: 기능, 가격, FAQ, 커뮤니티, 개인정보 보호, 이용약관, 라이선스, 소셜 링크
   - **이미 연결된 페이지**: 문서(`/docs`), 블로그(`/blog`)
+  
 - **커스텀 404 페이지 부재**: 현재 `src/app/not-found.tsx`가 없어 Next.js 기본 404 페이지가 표시됩니다. 필요에 따라 추가를 고려하세요.
 
 ### 핵심 아키텍처
@@ -97,19 +100,38 @@ export default function PageName() {
 **App Router 구조**
 - Next.js 16의 App Router 사용 (Pages Router 아님)
 - `src/app/` 디렉토리가 라우팅의 기본
+- 파일 시스템 기반 자동 라우팅: `src/app/features/page.tsx` → `/features`
 - `layout.tsx`는 모든 페이지의 기본 레이아웃 제공
-- ThemeProvider로 클라이언트 측 테마 관리 감싸기
+- ThemeProvider(`src/components/theme-provider.tsx`)로 클라이언트 측 테마 관리 감싸기
+- Root layout은 `suppressHydrationWarning`으로 테마 관련 hydration 경고 방지
 
 **스타일링 시스템**
-- Tailwind CSS v4: 설정 파일 불필요 (`@import "tailwindcss"`)
-- OKLch 색상 공간 기반 CSS 변수 (라이트/다크 모드 자동 전환)
-- `src/app/globals.css`에 `:root` CSS 변수로 테마 정의
-- `.dark` 클래스로 다크모드 스타일 오버라이드
+- Tailwind CSS v4: 설정 파일 불필요 (`@import "tailwindcss"` in globals.css)
+- OKLch 색상 공간 기반 CSS 변수로 라이트/다크 모드 자동 전환
+- `src/app/globals.css`에 `:root`와 `.dark` CSS 변수로 테마 정의
+- Semantic 색상 변수 사용: `bg-primary`, `text-muted-foreground`, `border-input` 등
+- `cn()` 유틸리티 함수로 Tailwind 클래스 충돌 자동 해결
 
 **UI 컴포넌트 시스템**
-- shadcn/ui 기반 접근성 높은 컴포넌트
-- Base UI (`@base-ui/react`)와 통합
-- `cn()` 유틸리티로 Tailwind 클래스 병합 (clsx + tailwind-merge)
+- shadcn/ui 기반 접근성 높은 컴포넌트 (Button, Card, Input, Label, Dialog, Avatar, Badge, Alert 등)
+- Base UI (`@base-ui/react`) 헤드리스 UI 라이브러리와 통합
+- class-variance-authority로 컴포넌트 변형 정의
+- 전체 컴포넌트는 `src/components/ui/`에 위치
+- 레이아웃 컴포넌트 (Header, Footer)는 `src/components/layout/`에 위치
+
+**데이터 입력 및 검증**
+- `react-hook-form`: 폼 상태 관리 (성능 최적화, 유효성 검사)
+- `zod`: TypeScript-first 스키마 유효성 검사 (form validation 권장)
+- `sonner`: 사용자 피드백용 토스트 알림 (에러, 성공 메시지)
+
+**레이아웃 구조**
+```
+Root Layout (layout.tsx)
+├── ThemeProvider (클라이언트 측 테마 관리)
+├── Header (고정 상단, 데스크톱/모바일 반응형)
+├── Page Content (동적 라우트)
+└── Footer (고정 하단, 반응형)
+```
 
 ## 🎨 테마 및 스타일링
 
@@ -217,14 +239,21 @@ export function Header() {
 
 | 패키지 | 버전 | 용도 |
 |--------|------|------|
-| `next` | 16.3.0 | React 프레임워크 (App Router) |
+| `next` | 16.3.0 | React 프레임워크 (App Router, Turbopack) |
 | `react` | 19.2.8 | UI 라이브러리 |
 | `typescript` | ^5 | 타입 체크 |
-| `tailwindcss` | ^4 | CSS-first 프레임워크 |
+| `tailwindcss` | ^4 | CSS-first 프레임워크 (설정 파일 불필요) |
 | `@base-ui/react` | ^1.7.0 | 헤드리스 UI 컴포넌트 |
 | `shadcn` | ^4.16.2 | UI 컴포넌트 라이브러리 |
-| `next-themes` | ^0.4.6 | 테마 관리 |
+| `next-themes` | ^0.4.6 | 테마 관리 (다크모드) |
 | `lucide-react` | ^1.30.0 | 아이콘 라이브러리 |
+| `react-hook-form` | ^7.85.0 | 폼 상태 관리 |
+| `zod` | ^4.4.3 | TypeScript-first 유효성 검사 |
+| `sonner` | ^2.0.8 | 토스트 알림 컴포넌트 |
+| `tw-animate-css` | ^1.4.0 | Tailwind 애니메이션 |
+| `class-variance-authority` | ^0.7.1 | 컴포넌트 변형 관리 |
+| `clsx` | ^2.1.1 | 조건부 클래스명 |
+| `tailwind-merge` | ^3.6.0 | Tailwind 클래스 병합 |
 
 ## 🔧 TypeScript 설정
 
@@ -275,13 +304,15 @@ export function Counter() {
 
 ## ⚙️ ESLint 설정
 
-프로젝트는 Next.js 공식 ESLint 구성을 사용합니다.
+프로젝트는 ESLint 9의 flat config (`eslint.config.mjs`) 형식을 사용하며, Next.js 공식 ESLint 구성이 적용되어 있습니다.
 
 ```bash
 npm run lint
 ```
 
-ESLint 경고/에러가 있으면 수정하고 커밋하기 전에 린트를 통과해야 합니다.
+ESLint 경고/에러가 있으면 수정하고 커밋하기 전에 린트를 통과해야 합니다. 
+
+**설정 파일**: `eslint.config.mjs`
 
 ## 🚀 빌드 및 배포
 
