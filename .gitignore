@@ -33,6 +33,10 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# Claude Code hooks 시크릿 (Slack 웹훅 URL 등)
+# 참고: .env* 패턴이 이미 포함하지만, 명시적으로 명시
+.claude/hooks/.env
+
 # vercel
 .vercel
 
@@ -42,7 +46,6 @@ next-env.d.ts
 
 # Playwright MCP (진단/테스팅용 임시 파일)
 .playwright-mcp/
-.mcp.json
 
 # 스크린샷 (진단용 캡처)
 *.png
