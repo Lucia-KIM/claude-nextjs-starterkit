@@ -374,3 +374,20 @@ npm start
 - 링크의 `href`가 올바른지 확인
 - 대상 라우트의 `page.tsx` 파일이 존재하는지 확인
 - 라우트 구조가 Next.js App Router 컨벤션을 따르는지 확인
+
+## 📱 Slack 알림 설정
+
+Claude Code에서 작업 진행 상황을 Slack으로 실시간 알림받을 수 있습니다.
+
+**설정 방법:**
+1. Slack Webhook URL 생성 (Slack 앱 설정에서 Incoming Webhooks)
+2. `.claude/hooks/.env` 파일 생성:
+   ```
+   SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+   ```
+
+**알림 종류:**
+- 🔐 **권한 요청 알림**: 파일 쓰기, 명령 실행 등 권한이 필요할 때
+- ✅ **작업 완료 알림**: 파일 저장(Write) 후 완료 상태 전송
+
+**상세 가이드는 `.claude/SLACK_SETUP.md` 참고**
